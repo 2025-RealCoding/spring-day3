@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link href="../css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .header-title {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        /* 도서 등록 버튼 스타일 */
+        .btn-add-book {
+            background-color: #4CAF50; /* 녹색 (긍정적인 느낌) */
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .btn-add-book:hover {
+            background-color: #45A049; /* 호버 시 더 어두운 녹색 */
+        }
+        /* 대출도서 조회 버튼 스타일 */
+        .btn-view-borrowed-books {
+            background-color: #FF5722; /* 주황색 (긴급성 및 주목성) */
+            color: white;f
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .btn-view-borrowed-books:hover {
+            background-color: #E64A19; /* 호버 시 더 어두운 주황색 */
+        }
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table thead {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header Section -->
+    <div class="py-5 text-center">
+        <h2 class="header-title">도서 목록</h2>
+    </div>
+
+    <!-- Buttons Section -->
+    <div class="row mb-3">
+        <!-- '도서 등록' Button -->
+        <div class="col text-start">
+            <button class="btn btn-add-book" onclick="location.href='addForm.html'" th:onclick="|location.href='@{/books/new}'|" type="button">도서 등록</button>
+        </div>
+
+        <!-- '대출도서 조회' Button -->
+        <div class="col text-end">
+            <button
+                    th:if="${memberId != null}"
+                    th:onclick="|location.href='@{/rentals/{memberId}/current(memberId=${memberId})}'|"
+                    class="btn btn-view-borrowed-books"
+                    type="button">
+                대출도서 조회
+            </button>
+        </div>
+    </div>
+
+    <!-- Divider -->
+    <hr class="my-4">
+
+    <!-- 에러 메시지 표시 -->
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}">
+        <!-- 에러 메시지가 없으면 이 영역은 렌더링되지 않음 -->
+    </div>
+
+    <!-- Table Section -->
+    <div>
+        <table class="table table-striped table-bordered shadow-sm">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>제목</th>
+                <th>작가</th>
+                <th>수량</th>
+                <th th:if="${memberId != null}">대여</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- If no books are available -->
+            <tr th:if="${books ==null or books.isEmpty()}">
+                <td colspan="4" class="text-center">등록된 도서가 없습니다.</td>
+            </tr>
+
+            <!-- Iterate through books -->
+            <tr th:each="book : ${books}">
+                <td th:text="${book.id}"></td> <!-- 도서 ID -->
+                <td th:text="${book.title}"></td> <!-- 도서 제목 -->
+                <td th:text="${book.author}"></td> <!-- 도서 작가 -->
+                <td th:text="${book.quantity}"></td> <!-- 도서 수량 -->
+
+                <!-- '대여' 버튼 -->
+                <td th:if="${memberId != null}">
+                    <form method="post" th:action="@{/rentals/rent}">
+                        <input type="hidden" name="memberId" th:value="${memberId}" />
+                        <input type="hidden" name="bookId" th:value="${book.id}" />
+                        <button type="submit" class="btn btn-borrow-book">대여</button>
+                    </form>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Home Button -->
+    <div class="row">
+        <div class="col">
+            <button class="w-100 btn btn-secondary btn-lg" onclick="location.href='/'">홈으로</button>
+        </div>
+    </div>
+</div>
+<!-- /container -->
+</body>
+</html>
